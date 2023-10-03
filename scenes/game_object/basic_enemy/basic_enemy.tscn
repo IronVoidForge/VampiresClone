@@ -1,0 +1,114 @@
+[gd_scene load_steps=12 format=3 uid="uid://c3rj31lydt0pa"]
+
+[ext_resource type="Script" path="res://scenes/game_object/basic_enemy/basic_enemy.gd" id="1_4niur"]
+[ext_resource type="PackedScene" uid="uid://3ju1po1quafk" path="res://scenes/component/health_component.tscn" id="2_kd458"]
+[ext_resource type="Texture2D" uid="uid://dyurnu3futi4d" path="res://scenes/game_object/basic_enemy/basic_enemy.png" id="2_wlyjs"]
+[ext_resource type="PackedScene" uid="uid://c5134nnx2xig6" path="res://scenes/component/vial_drop_component.tscn" id="3_oqni1"]
+[ext_resource type="PackedScene" uid="uid://c3omreiv1ohwl" path="res://scenes/component/death_component.tscn" id="4_jalok"]
+[ext_resource type="PackedScene" uid="uid://cgm3k0d1pvge2" path="res://scenes/component/hurtbox_component.tscn" id="4_vtjco"]
+
+[sub_resource type="Animation" id="Animation_5oowu"]
+resource_name = "walk"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Visuals/Sprite2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(-1, 0), Vector2(1, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Visuals/Sprite2D:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.0, -0.0872665, 0.0872665, -0.0872665, 0.0872665]
+}
+
+[sub_resource type="Animation" id="Animation_c1mqv"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Visuals/Sprite2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-0.00217629),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Visuals/Sprite2D:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ycav7"]
+_data = {
+"RESET": SubResource("Animation_c1mqv"),
+"walk": SubResource("Animation_5oowu")
+}
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_avhh4"]
+radius = 11.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1xacp"]
+radius = 6.0
+
+[node name="BasicEnemy" type="CharacterBody2D" groups=["enemy"]]
+collision_layer = 8
+collision_mask = 9
+motion_mode = 1
+script = ExtResource("1_4niur")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+autoplay = "walk"
+libraries = {
+"": SubResource("AnimationLibrary_ycav7")
+}
+
+[node name="HealthComponent" parent="." instance=ExtResource("2_kd458")]
+
+[node name="VialDropComponent" parent="." node_paths=PackedStringArray("health_component") instance=ExtResource("3_oqni1")]
+health_component = NodePath("../HealthComponent")
+
+[node name="DeathComponent" parent="." node_paths=PackedStringArray("health_component", "sprite") instance=ExtResource("4_jalok")]
+health_component = NodePath("../HealthComponent")
+sprite = NodePath("../Visuals/Sprite2D")
+
+[node name="HurtboxComponent" parent="." node_paths=PackedStringArray("health_component") instance=ExtResource("4_vtjco")]
+health_component = NodePath("../HealthComponent")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtboxComponent"]
+position = Vector2(0, -3)
+shape = SubResource("CircleShape2D_avhh4")
+
+[node name="Visuals" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Visuals"]
+texture = ExtResource("2_wlyjs")
+offset = Vector2(0, -4)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -3)
+shape = SubResource("CircleShape2D_1xacp")
